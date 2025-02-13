@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Realistic Airmail Envelope</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .envelope {
+            position: relative;
+            width: 90%;
+            max-width: 420px;
+            height: 260px;
+            background: #fdfdfd;
+            border-radius: 5px;
+            box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3);
+            border: 12px solid transparent;
+            border-image: repeating-linear-gradient(45deg, red 0%, red 5%, white 5%, white 10%, blue 10%, blue 15%, white 15%, white 20%) 10;
+            overflow: hidden;
+        }
+
+        .flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50%;
+            background: #e6e6e6;
+            clip-path: polygon(0% 0%, 12% 60%, 50% 90%, 88% 60%, 100% 0%);
+            transition: transform 0.5s ease-in-out;
+            transform-origin: top center;
+        }
+
+        .paper {
+            position: absolute;
+            bottom: 5px;
+            left: 50%;
+            width: 90%;
+            height: 180px;
+            background: white;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            padding: 2px;
+            transform: translateX(-50%) translateY(100%);
+            transition: transform 0.8s ease-in-out;
+        }
+
+        .paper p {
+            margin: 0;
+            padding: 15px;
+            font-size: 14px;
+        }
+
+        .btn-container {
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .btn {
+            font-size: 16px;
+            padding: 10px 20px;
+        }
+
+        /* Heart Animation */
+        .heart {
+            position: absolute;
+            width: 25px;
+            height: 25px;
+            background-color: red;
+            transform: rotate(-45deg);
+            opacity: 1;
+            animation: popHeart 2s forwards;
+        }
+
+        .heart:before,
+        .heart:after {
+            content: '';
+            position: absolute;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background-color: red;
+        }
+
+        .heart:before {
+            left: 0;
+            top: -12px;
+        }
+
+        .heart:after {
+            left: 12px;
+            top: 0;
+        }
+
+        @keyframes popHeart {
+            0% {
+                transform: scale(0) rotate(-45deg);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.5) rotate(-45deg);
+            }
+
+            100% {
+                transform: scale(0) rotate(-45deg);
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .envelope {
+                width: 95%;
+                height: 220px;
+            }
+
+            .paper {
+                height: 160px;
+            }
+
+            .paper p {
+                font-size: 12px;
+                padding: 10px;
+            }
+
+            .btn {
+                font-size: 14px;
+                padding: 8px 16px;
+            }
+
+            .heart {
+                width: 20px;
+                height: 20px;
+            }
+
+            .heart:before,
+            .heart:after {
+                width: 20px;
+                height: 20px;
+            }
+
+            .heart:before {
+                top: -10px;
+            }
+
+            .heart:after {
+                left: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="envelope" id="envelope">
+        <div class="flap" id="flap"></div>
+        <div class="paper" id="paper">
+            <p>Happy Valentine’s Day! Every moment with you is a blessing. Your love fills my heart with so much joy,
+            and I cherish you more than words can say. ❤️ Thank you
+            for being you — you are my forever. ❤️
+                Your smile brightens my world, and with you by my side, I know there’s nothing I can’t face. Forever and
+                always, you are my heart’s home.
+            </p>
+        </div>
+    </div>
+
+    <div class="btn-container">
+        <button class="btn btn-primary" onclick="toggleEnvelope()">Open/Close Envelope</button>
+    </div>
+
+    <audio id="music" src="/Michael Bolton - Said I Loved You...But I Lied(MP3_160K).mp3"
+        preload="auto"></audio>
+
+    <script>
+        let clickCount = 0;
+        const envelope = document.getElementById('envelope');
+        const music = document.getElementById("music");
+        let heartInterval;
+
+        function toggleEnvelope() {
+            const flap = document.getElementById("flap");
+            const paper = document.getElementById("paper");
+
+            addHearts();
+
+            if (music.paused) {
+                music.play();
+                startHeartAnimation();
+            } else {
+                music.pause();
+                stopHeartAnimation();
+            }
+
+            clickCount++;
+
+            if (clickCount % 2 === 1) {
+                flap.style.transform = "rotateX(180deg)";
+                paper.style.transform = "translateX(-50%) translateY(-50px)";
+            } else {
+                flap.style.transform = "rotateX(0deg)";
+                paper.style.transform = "translateX(-50%) translateY(100%)";
+                setTimeout(() => {
+                    paper.classList.add("hidden");
+                }, 800);
+            }
+        }
+
+        function addHearts() {
+            const heartCount = 5;
+            for (let i = 0; i < heartCount; i++) {
+                const heart = document.createElement('div');
+                heart.classList.add('heart');
+                heart.style.top = `${Math.random() * window.innerHeight * 0.7}px`;
+                heart.style.left = `${Math.random() * window.innerWidth * 0.9}px`;
+                document.body.appendChild(heart);
+                setTimeout(() => heart.remove(), 2000);
+            }
+        }
+
+        function startHeartAnimation() {
+            heartInterval = setInterval(addHearts, 2000);
+        }
+
+        function stopHeartAnimation() {
+            clearInterval(heartInterval);
+        }
+    </script>
+</body>
+
+</html>
